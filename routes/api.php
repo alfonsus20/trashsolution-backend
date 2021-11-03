@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PenggunaController;
+use App\Http\Controllers\SampahController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,3 +31,5 @@ Route::group(['prefix' => 't'], function () {
     Route::post('register', [AuthController::class, 'registerTrashpicker']);
     Route::post('login', [AuthController::class, 'loginTrashpicker']);
 });
+
+Route::get('getSampah', [SampahController::class, 'getSampah']);

@@ -19,6 +19,7 @@ class CreatePenjualanSampahTable extends Migration
             $table->unsignedBigInteger('id_sampah');
             $table->foreign('id_penjualan')->references('id')->on('penjualan');
             $table->foreign('id_sampah')->references('id')->on('sampah');
+            $table->integer('qty');
             $table->timestamps();
         });
     }
