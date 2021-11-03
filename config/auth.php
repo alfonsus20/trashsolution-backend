@@ -14,8 +14,8 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
-        'passwords' => 'users',
+        'guard' => 'pengguna',
+        'passwords' => 'pengguna',
     ],
 
     /*
@@ -38,7 +38,15 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
-            'provider' => 'users',
+            'provider' => 'pengguna',
+        ],
+        'pengguna' => [
+            'driver' => 'passport',
+            'provider' => 'pengguna',
+        ],
+        'trashpicker' => [
+            'driver' => 'passport',
+            'provider' => 'trashpicker',
         ],
     ],
 
@@ -60,9 +68,13 @@ return [
     */
 
     'providers' => [
-        'users' => [
+        'pengguna' => [
             'driver' => 'eloquent',
-            'model' => App\Models\User::class,
+            'model' => App\Models\Pengguna::class,
+        ],
+        'trashpicker' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Trashpicker::class,
         ],
 
         // 'users' => [

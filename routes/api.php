@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PenggunaController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,6 +16,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+
+Route::group(['prefix' => 'p'], function () {
+    Route::post('register', [AuthController::class, 'registerPengguna']);
+    Route::post('login', [AuthController::class, 'loginPengguna']);
+
+    Route::group(['middleware' => ['auth:pengguna', 'scopes:pengguna']], function () {
+        Route::get('home', [PenggunaController::class, 'index']);
+    });
+});
+
+Route::group(['prefix' => 't'], function () {
+    Route::post('register', [AuthController::class, 'registerTrashpicker']);
+    Route::post('login', [AuthController::class, 'loginTrashpicker']);
 });
