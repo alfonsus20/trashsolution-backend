@@ -27,10 +27,14 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Passport::routes();
+
         Passport::tokensCan([
             'pengguna' => 'Pengguna utama aplikasi',
             'trashpicker' => 'Melakukan penjemputan dan validasi sampah',
         ]);
+
+        Passport::tokensExpireIn(now()->addDays(90));
+        Passport::refreshTokensExpireIn(now()->addDays(180));
 
         Passport::setDefaultScope([
             'pengguna',

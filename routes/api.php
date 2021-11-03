@@ -32,4 +32,4 @@ Route::group(['prefix' => 't'], function () {
     Route::post('login', [AuthController::class, 'loginTrashpicker']);
 });
 
-Route::get('getSampah', [SampahController::class, 'getSampah']);
+Route::get('/daftar-sampah', [SampahController::class, 'getSampah']);

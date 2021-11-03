@@ -7,8 +7,9 @@ use App\Models\Sampah;
 
 class SampahController extends Controller
 {
-    public function getSampah(){
+    public function getSampah()
+    {
         $sampah = Sampah::all();
-        return response()->json($sampah);
+        return response()->json(['success' => true, 'message' => 'fetch sampah berhasil', 'data' => $sampah]);
     }
 }
