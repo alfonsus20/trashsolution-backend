@@ -9,4 +9,14 @@ class Penjualan extends Model
 {
     use HasFactory;
     protected $table = "penjualan";
+
+    public function pengguna()
+    {
+        return $this->belongsTo(Pengguna::class, 'id_pengguna');
+    }
+
+    public function penjualanSampah()
+    {
+        return $this->hasMany(PenjualanSampah::class, "id_penjualan");
+    }
 }

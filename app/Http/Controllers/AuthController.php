@@ -134,4 +134,8 @@ class AuthController extends Controller
             return response()->json(['success' => false, 'message' => 'Password salah']);
         }
     }
+
+    public function getPenggunaData(){
+        return auth()->user();
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\Penjualan;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -10,18 +11,19 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class PenjualanSampahNotification implements ShouldBroadcast
+class PenjualanSampahPenggunaNotification implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-    public $message;
+    public $message, $penjualan;
 
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($message)
+    public function __construct(Penjualan $penjualan, String $message)
     {
+        $this->penjualan = $penjualan;
         $this->message = $message;
     }
 
@@ -32,10 +34,11 @@ class PenjualanSampahNotification implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('penjualan-sampah');
+        return new PrivateChannel('penjualan-sampah.' . $this->penjualan->id);
     }
 
-    // public function broadcastAs(){
-    //     return "broadcast as";
-    // }
+    public function broadcastAs()
+    {
+        return "penjualan-sampah-pengguna-notification";
+    }
 }

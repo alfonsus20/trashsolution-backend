@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\PenjualanSampahPenggunaNotification;
+use App\Models\Pengguna;
 use App\Models\Penjualan;
 use App\Models\PenjualanSampah;
 use App\Models\Sampah;
@@ -19,15 +21,14 @@ class PenjualanSampahController extends Controller
             return response()->json(['success' => false, "message" => "No trashpickers available"], 404);
         }
 
-        $inputs = $request->only(['lat_pengguna', 'long_pengguna', 'daftar_sampah']);
         $daftar_sampah = $request->daftar_sampah;
 
         $penjualan = new Penjualan();
-        $penjualan->lat_pengguna = $inputs['lat_pengguna'];
-        $penjualan->long_pengguna = $inputs['long_pengguna'];
+        $penjualan->lat_pengguna = auth()->user()->lat;
+        $penjualan->long_pengguna =  auth()->user()->long;
         $penjualan->lat_trashpicker = 0;
         $penjualan->long_trashpicker = 0;
-        $penjualan->status = false;
+        $penjualan->status = "mencari trashpicker";
         $penjualan->id_pengguna = auth()->id();
 
         $total_harga = 0;
@@ -50,5 +51,59 @@ class PenjualanSampahController extends Controller
         PenjualanSampah::insert($daftar_sampah_with_id_penjualan);
 
         return response()->json(['success' => true, 'message' => 'Penjualan Sampah Berhasil. Sedang mencari trashpicker']);
+    }
+
+
+    public function getDaftarPermintaanPenjemputan()
+    {
+        $daftar_permintaan_penjemputan = Penjualan::select("penjualan.id", "nama")->join("pengguna", "id_pengguna", "=", "pengguna.id")->where("status", "mencari trashpicker")->get();
+        return response()->json(['success' => true, 'message' => 'Fetch daftar permintaan berhasil', 'data' => $daftar_permintaan_penjemputan]);
+    }
+
+    public function getDetailPermintaanPenjemputan($id_penjualan)
+    {
+        $info_penjualan = Penjualan::find($id_penjualan);
+        $pengguna = Penjualan::find($id_penjualan)->pengguna()->get();
+        $penjualan_sampah = PenjualanSampah::where("id_penjualan", $id_penjualan)->get();
+
+        $penjualan_sampah_with_sampah = [];
+
+        foreach ($penjualan_sampah as $penjualan) {
+            $sampah = Sampah::find($penjualan->id_sampah);
+            $penjualan_sampah_with_sampah[] = ["kuantitas" => $penjualan->kuantitas, "sampah" => $sampah];
+        }
+
+        return response()->json(['success' => true, 'message' => 'Fetch detail permintaan penjemputan berhasil', 'data' => ["penjualan" => $info_penjualan, "pengguna" => $pengguna, "daftar_sampah" => $penjualan_sampah_with_sampah]]);
+    }
+
+    public function ubahStatusPenjualan($id, $status)
+    {
+        $penjualan = Penjualan::find($id);
+
+        if ($status == 'tunggu') {
+            $penjualan->status = 'menunggu trashpicker';
+            $penjualan->id_trashpicker = auth()->user()->id;
+            $penjualan->lat_trashpicker = auth()->user()->lat;
+            $penjualan->long_trashpicker = auth()->user()->long;
+            $penjualan->save();
+
+            event(new PenjualanSampahPenggunaNotification($penjualan, "Update status ke menunggu trashpicker"));
+
+            return response()->json(['success' => true, 'message' => "Ubah status ke menunggu trashpicker berhasil"]);
+        } else if ($status == 'tiba') {
+            $penjualan->status = 'tiba';
+            $penjualan->save();
+
+            event(new PenjualanSampahPenggunaNotification($penjualan, "Update status ke tiba di lokasi"));
+            return response()->json(['success' => true, 'message' => "Ubah status ke tiba berhasil"]);
+        } else if ($status == 'selesai') {
+            $penjualan->status = 'selesai';
+            $penjualan->save();
+
+            event(new PenjualanSampahPenggunaNotification($penjualan, "Update status ke selesai"));
+            return response()->json(['success' => true, 'message' => "Ubah status ke selesai berhasil"]);
+        } else {
+            return response()->json(['success' => false, 'message' => "Status tidak ditemukan"], 400);
+        }
     }
 }

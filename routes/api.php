@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => 'p'], function () {
     Route::post('register', [AuthController::class, 'registerPengguna']);
     Route::post('login', [AuthController::class, 'loginPengguna']);
+    Route::get('/auth',[AuthController::class, 'getPenggunaData']);
 
     Route::group(['middleware' => ['auth:pengguna', 'scopes:pengguna']], function () {
         Route::get('home', [PenggunaController::class, 'index']);
@@ -35,12 +36,10 @@ Route::group(['prefix' => 't'], function () {
     Route::post('login', [AuthController::class, 'loginTrashpicker']);
 
     Route::group(['middleware' => ['auth:trashpicker', 'scopes:trashpicker']], function () {
-        // Route::post('jual-sampah', [PenjualanSampahController::class, 'jualSampah']);
+        Route::get('daftar-permintaan', [PenjualanSampahController::class, 'getDaftarPermintaanPenjemputan']);
+        Route::get('daftar-permintaan/{id}', [PenjualanSampahController::class, 'getDetailPermintaanPenjemputan']);
+        Route::get('daftar-permintaan/{id}/{status}', [PenjualanSampahController::class, 'ubahStatusPenjualan']);
     });
 });
 
 Route::get('daftar-sampah', [SampahController::class, 'getSampah']);
-
-Route::get("/event", function () {
-    event(new PenjualanSampahNotification("hello zheyenk"));
-});

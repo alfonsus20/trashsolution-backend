@@ -23,4 +23,9 @@ class Sampah extends Model
         'harga',
         'gambar'
     ];
+
+    public function penjualanSampah()
+    {
+        return $this->belongsToMany(PenjualanSampah::class);
+    }
 }

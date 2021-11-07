@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Penjualan;
 use Illuminate\Support\Facades\Broadcast;
 
 /*
@@ -17,6 +18,10 @@ use Illuminate\Support\Facades\Broadcast;
 //     return (int) $user->id === (int) $id;
 // });
 
-Broadcast::channel('penjualan-sampah', function () {
-    return true;
+Broadcast::channel('penjualan-sampah.{id}', function ($user, $id) {
+    return $user->id == Penjualan::find($id)->id_pengguna;
+});
+
+Broadcast::channel('penjualan-sampah-trashpicker.{id}', function ($user, $id) {
+    return $user->id == Penjualan::find($id)->id_trashpicker;
 });

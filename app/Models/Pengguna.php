@@ -42,4 +42,9 @@ class Pengguna extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function penjualan()
+    {
+        $this->hasMany(Penjualan::class);
+    }
 }
