@@ -1,7 +1,9 @@
 <?php
 
+use App\Events\PenjualanSampahNotification;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PenggunaController;
+use App\Http\Controllers\PenjualanSampahController;
 use App\Http\Controllers\SampahController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -24,12 +26,21 @@ Route::group(['prefix' => 'p'], function () {
 
     Route::group(['middleware' => ['auth:pengguna', 'scopes:pengguna']], function () {
         Route::get('home', [PenggunaController::class, 'index']);
+        Route::post('jual-sampah', [PenjualanSampahController::class, 'jualSampah']);
     });
 });
 
 Route::group(['prefix' => 't'], function () {
     Route::post('register', [AuthController::class, 'registerTrashpicker']);
     Route::post('login', [AuthController::class, 'loginTrashpicker']);
+
+    Route::group(['middleware' => ['auth:trashpicker', 'scopes:trashpicker']], function () {
+        // Route::post('jual-sampah', [PenjualanSampahController::class, 'jualSampah']);
+    });
 });
 
-Route::get('/daftar-sampah', [SampahController::class, 'getSampah']);
+Route::get('daftar-sampah', [SampahController::class, 'getSampah']);
+
+Route::get("/event", function () {
+    event(new PenjualanSampahNotification("hello zheyenk"));
+});
