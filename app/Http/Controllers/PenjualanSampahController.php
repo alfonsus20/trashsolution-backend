@@ -79,6 +79,7 @@ class PenjualanSampahController extends Controller
     public function ubahStatusPenjualan($id, $status)
     {
         $penjualan = Penjualan::find($id);
+        // check perubahan status masih perlu ditambahkan
 
         if ($status == 'tunggu') {
             $penjualan->status = 'menunggu trashpicker';
@@ -99,6 +100,8 @@ class PenjualanSampahController extends Controller
         } else if ($status == 'selesai') {
             $penjualan->status = 'selesai';
             $penjualan->save();
+
+            // kurang tambah saldo di sini
 
             event(new PenjualanSampahPenggunaNotification($penjualan, "Update status ke selesai"));
             return response()->json(['success' => true, 'message' => "Ubah status ke selesai berhasil"]);
