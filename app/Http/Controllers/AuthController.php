@@ -7,6 +7,7 @@ use App\Models\Trashpicker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Nexmo\Laravel\Facade\Nexmo;
 
 class AuthController extends Controller
 {
@@ -137,5 +138,28 @@ class AuthController extends Controller
 
     public function getPenggunaData(){
         return auth()->user();
+    }
+
+    public function sendPhoneNumberOTP($phoneNumber)
+    {
+        $otp = (string) mt_rand(1000, 9999);
+
+        Nexmo::message()->send([
+            'to' => $phoneNumber,
+            'from' => 'TRASHOLUTION',
+            'text' => "OTP untuk registrasi Trasholution: $otp"
+        ]);
+
+        return response()->json(['success' => true, 'message' => 'SMS OTP terkirim!', 'otp' => $otp]);
+    }
+
+    public function verifyPhoneNumberOTP(Request $request, $otp)
+    {
+        if ($request->userInput == $otp){
+            return response()->json(['success' => true, 'message' => 'OTP benar']);
+        }
+        else {
+            return response()->json(['success' => false, 'message' => 'OTP salah']);
+        }
     }
 }
