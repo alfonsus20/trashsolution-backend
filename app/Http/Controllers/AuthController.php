@@ -142,9 +142,14 @@ class AuthController extends Controller
         }
     }
 
-    public function getPenggunaData()
+    public function getPenggunaProfile()
     {
         return auth()->user();
+    }
+
+    public function getTrashpickerProfile()
+    {
+        return  auth()->user();
     }
 
     public function sendPhoneNumberOTP($phoneNumber)
@@ -167,5 +172,23 @@ class AuthController extends Controller
         } else {
             return response()->json(['success' => false, 'message' => 'OTP salah']);
         }
+    }
+
+    public function updateLokasiPengguna(Request $request)
+    {
+        $pengguna = Pengguna::find(auth()->user()->id);
+        $pengguna->lat = $request->lat;
+        $pengguna->long = $request->long;
+        $pengguna->save();
+        return response()->json(['success' => true, 'message' => 'Update lokasi pengguna berhasil']);
+    }
+
+    public function updateLokasiTrashpicker(Request $request)
+    {
+        $trashpicker = Trashpicker::find(auth()->user()->id);
+        $trashpicker->lat = $request->lat;
+        $trashpicker->long = $request->long;
+        $trashpicker->save();
+        return response()->json(['success' => true, 'message' => 'Update lokasi trashpicker berhasil']);
     }
 }

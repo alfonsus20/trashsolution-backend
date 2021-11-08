@@ -23,9 +23,10 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => 'p'], function () {
     Route::post('register', [AuthController::class, 'registerPengguna']);
     Route::post('login', [AuthController::class, 'loginPengguna']);
-    Route::get('/auth',[AuthController::class, 'getPenggunaData']);
 
     Route::group(['middleware' => ['auth:pengguna', 'scopes:pengguna']], function () {
+        Route::get('profile', [AuthController::class, 'getPenggunaProfile']);
+        Route::put('update-lokasi', [AuthController::class, 'updateLokasiPengguna']);
         Route::get('home', [PenggunaController::class, 'index']);
         Route::post('jual-sampah', [PenjualanSampahController::class, 'jualSampah']);
     });
@@ -36,6 +37,8 @@ Route::group(['prefix' => 't'], function () {
     Route::post('login', [AuthController::class, 'loginTrashpicker']);
 
     Route::group(['middleware' => ['auth:trashpicker', 'scopes:trashpicker']], function () {
+        Route::get('profile', [AuthController::class, 'getTrashpickerProfile']);
+        Route::put('update-lokasi', [AuthController::class, 'updateLokasiTrashpicker']);
         Route::get('daftar-permintaan', [PenjualanSampahController::class, 'getDaftarPermintaanPenjemputan']);
         Route::get('daftar-permintaan/{id}', [PenjualanSampahController::class, 'getDetailPermintaanPenjemputan']);
         Route::get('daftar-permintaan/{id}/{status}', [PenjualanSampahController::class, 'ubahStatusPenjualan']);
