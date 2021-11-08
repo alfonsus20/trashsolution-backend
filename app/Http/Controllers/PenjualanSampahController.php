@@ -6,6 +6,7 @@ use App\Events\PenjualanSampahPenggunaNotification;
 use App\Models\Pengguna;
 use App\Models\Penjualan;
 use App\Models\PenjualanSampah;
+use App\Models\Saldo;
 use App\Models\Sampah;
 use App\Models\Trashpicker;
 use Illuminate\Http\Request;
@@ -79,9 +80,21 @@ class PenjualanSampahController extends Controller
     public function ubahStatusPenjualan($id, $status)
     {
         $penjualan = Penjualan::find($id);
-        // check perubahan status masih perlu ditambahkan
+        $current_status = $penjualan['status'];
+        $trashpicker = Trashpicker::find(auth()->user()->id);
+
+        if (!$penjualan) {
+            return response()->json(['success' => false, 'message' => "Permintaan penjemputan tidak ditemukan"], 404);
+        }
 
         if ($status == 'tunggu') {
+            if ($current_status != 'mencari trashpicker') {
+                return response()->json(['success' => false, 'message' => "Status hanya dapat diubah dari keadaan mencari trashpicker"], 400);
+            }
+
+            $trashpicker->availability = false;
+            $trashpicker->save();
+
             $penjualan->status = 'menunggu trashpicker';
             $penjualan->id_trashpicker = auth()->user()->id;
             $penjualan->lat_trashpicker = auth()->user()->lat;
@@ -92,21 +105,36 @@ class PenjualanSampahController extends Controller
 
             return response()->json(['success' => true, 'message' => "Ubah status ke menunggu trashpicker berhasil"]);
         } else if ($status == 'tiba') {
+            if ($current_status != 'menunggu trashpicker') {
+                return response()->json(['success' => false, 'message' => "Status hanya dapat diubah dari keadaan menunggu trashpicker"], 400);
+            }
             $penjualan->status = 'tiba';
             $penjualan->save();
 
             event(new PenjualanSampahPenggunaNotification($penjualan, "Update status ke tiba di lokasi"));
+
             return response()->json(['success' => true, 'message' => "Ubah status ke tiba berhasil"]);
         } else if ($status == 'selesai') {
+            if ($current_status != 'tiba') {
+                return response()->json(['success' => false, 'message' => "Status hanya dapat diubah dari keadaan tiba"], 400);
+            }
+
             $penjualan->status = 'selesai';
             $penjualan->save();
 
-            // kurang tambah saldo di sini
+            $saldo = Saldo::where('id_pengguna', $penjualan->id_pengguna)->first();
+
+            $saldo->nominal = $saldo->nominal + $penjualan->total_harga;
+            $saldo->save();
+
+            $trashpicker->availability = true;
+            $trashpicker->save();
 
             event(new PenjualanSampahPenggunaNotification($penjualan, "Update status ke selesai"));
+
             return response()->json(['success' => true, 'message' => "Ubah status ke selesai berhasil"]);
         } else {
-            return response()->json(['success' => false, 'message' => "Status tidak ditemukan"], 400);
+            return response()->json(['success' => false, 'message' => "Status tidak ditemukan"], 404);
         }
     }
 }

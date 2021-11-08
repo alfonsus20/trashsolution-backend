@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Pengguna;
+use App\Models\Saldo;
 use App\Models\Trashpicker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -36,8 +37,13 @@ class AuthController extends Controller
         $newPengguna  = new Pengguna();
         $newPengguna->fill($inputs);
         $newPengguna->password = Hash::make($inputs['password']);
-
         $newPengguna->save();
+
+
+        $saldo = new Saldo();
+        $saldo->nominal = 0;
+        $saldo->id_pengguna = $newPengguna->id;
+        $saldo->save();
 
         return response()->json(['success' => true, 'message' => 'Register user berhasil']);
     }
@@ -136,7 +142,8 @@ class AuthController extends Controller
         }
     }
 
-    public function getPenggunaData(){
+    public function getPenggunaData()
+    {
         return auth()->user();
     }
 
@@ -155,10 +162,9 @@ class AuthController extends Controller
 
     public function verifyPhoneNumberOTP(Request $request, $otp)
     {
-        if ($request->userInput == $otp){
+        if ($request->userInput == $otp) {
             return response()->json(['success' => true, 'message' => 'OTP benar']);
-        }
-        else {
+        } else {
             return response()->json(['success' => false, 'message' => 'OTP salah']);
         }
     }
