@@ -48,4 +48,4 @@ Route::group(['prefix' => 't'], function () {
 Route::get('daftar-sampah', [SampahController::class, 'getSampah']);
 
 Route::get('send-otp/{phoneNumber}', [AuthController::class, 'sendPhoneNumberOTP']);
-Route::post('verify-otp/{otp}', [AuthController::class, 'verifyPhoneNumberOTP']);
+Route::post('verify-otp', [AuthController::class, 'verifyPhoneNumberOTP']);

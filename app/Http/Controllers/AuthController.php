@@ -9,43 +9,53 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Nexmo\Laravel\Facade\Nexmo;
+use App\Models\OTP;
 
 class AuthController extends Controller
 {
     public function registerPengguna(Request $request)
     {
-        $rules = [
-            'nama' => 'required|max:255',
-            'email' => 'required|unique:pengguna|max:255',
-            'password' => 'required',
-            'phone' => 'required',
-        ];
+        $phone = '+'.$request->phone;
 
-        $validator = Validator::make($request->all(), $rules);
+        $otp = OTP::where('phone', $phone)->first();
 
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'message' => $validator->errors()->first()], 400);
+        if($otp->otp != $request->otp){
+            return response()->json(['success' => false, 'message' => 'Kode OTP salah!'], 400);
         }
-
-        $inputs = $request->only([
-            'phone',
-            'email',
-            'nama',
-            'password'
-        ]);
-
-        $newPengguna  = new Pengguna();
-        $newPengguna->fill($inputs);
-        $newPengguna->password = Hash::make($inputs['password']);
-        $newPengguna->save();
-
-
-        $saldo = new Saldo();
-        $saldo->nominal = 0;
-        $saldo->id_pengguna = $newPengguna->id;
-        $saldo->save();
-
-        return response()->json(['success' => true, 'message' => 'Register user berhasil']);
+        else{
+            $rules = [
+                'nama' => 'required|max:255',
+                'email' => 'required|unique:pengguna|max:255',
+                'password' => 'required',
+                'phone' => 'required',
+            ];
+    
+            $validator = Validator::make($request->all(), $rules);
+    
+            if ($validator->fails()) {
+                return response()->json(['success' => false, 'message' => $validator->errors()->first()], 400);
+            }
+    
+            $inputs = $request->only([
+                'phone',
+                'email',
+                'nama',
+                'password'
+            ]);
+    
+            $newPengguna  = new Pengguna();
+            $newPengguna->fill($inputs);
+            $newPengguna->password = Hash::make($inputs['password']);
+            $newPengguna->save();
+    
+    
+            $saldo = new Saldo();
+            $saldo->nominal = 0;
+            $saldo->id_pengguna = $newPengguna->id;
+            $saldo->save();
+    
+            return response()->json(['success' => true, 'message' => 'Register user berhasil']);
+        }       
     }
 
     public function loginPengguna(Request $request)
@@ -81,34 +91,44 @@ class AuthController extends Controller
 
     public function registerTrashpicker(Request $request)
     {
-        $rules = [
-            'nama' => 'required|max:255',
-            'email' => 'required|unique:trashpicker|max:255',
-            'password' => 'required',
-            'phone' => 'required',
-        ];
+        $phone = '+'.$request->phone;
 
-        $validator = Validator::make($request->all(), $rules);
+        $otp = OTP::where('phone', $phone)->first();
 
-        if ($validator->fails()) {
-            return response()->json(['success' => false, 'message' => $validator->errors()->first()], 400);
+        if($otp->otp != $request->otp){
+            return response()->json(['success' => false, 'message' => 'Kode OTP salah!'], 400);
         }
-
-        $inputs = $request->only([
-            'nama',
-            'phone',
-            'email',
-            'password'
-        ]);
-
-        $newTrashpicker  = new Trashpicker();
-        $newTrashpicker->fill($inputs);
-        $newTrashpicker->password = Hash::make($inputs['password']);
-        $newTrashpicker->availability = false;
-
-        $newTrashpicker->save();
-
-        return response()->json(['success' => true, 'message' => 'Register trashpicker berhasil']);
+        else{
+            $rules = [
+                'nama' => 'required|max:255',
+                'email' => 'required|unique:trashpicker|max:255',
+                'password' => 'required',
+                'phone' => 'required',
+            ];
+    
+            $validator = Validator::make($request->all(), $rules);
+    
+            if ($validator->fails()) {
+                return response()->json(['success' => false, 'message' => $validator->errors()->first()], 400);
+            }
+    
+            $inputs = $request->only([
+                'nama',
+                'phone',
+                'email',
+                'password'
+            ]);
+    
+    
+            $newTrashpicker  = new Trashpicker();
+            $newTrashpicker->fill($inputs);
+            $newTrashpicker->password = Hash::make($inputs['password']);
+            $newTrashpicker->availability = false;
+    
+            $newTrashpicker->save();
+    
+            return response()->json(['success' => true, 'message' => 'Register trashpicker berhasil']);
+        }
     }
 
     public function loginTrashpicker(Request $request)
@@ -156,19 +176,40 @@ class AuthController extends Controller
     {
         $otp = (string) mt_rand(1000, 9999);
 
+        // send otp sms
         Nexmo::message()->send([
             'to' => $phoneNumber,
             'from' => 'TRASHOLUTION',
             'text' => "OTP untuk registrasi Trasholution: $otp"
         ]);
 
+        // check if phone already exist
+        $tmp = OTP::where('phone', $phoneNumber)->first();
+
+        if ($tmp->count() == 1){
+            $tmp->delete();
+        }
+
+        // add otp data to otp table
+        $otpData = new OTP();
+        $otpData->phone = $phoneNumber;
+        $otpData->otp = $otp;
+        $otpData->save();
+
         return response()->json(['success' => true, 'message' => 'SMS OTP terkirim!', 'otp' => $otp]);
     }
 
-    public function verifyPhoneNumberOTP(Request $request, $otp)
+    public function verifyPhoneNumberOTP(Request $request)
     {
-        if ($request->userInput == $otp) {
-            return response()->json(['success' => true, 'message' => 'OTP benar']);
+        if ($request->userInput == $request->otp) {
+            $newTrashpicker  = new Trashpicker();
+            $newTrashpicker->fill($request->inputs);
+            $newTrashpicker->password = Hash::make($request->input('inputs.password'));
+            $newTrashpicker->availability = false;
+
+            $newTrashpicker->save();
+
+            return response()->json(['success' => true, 'message' => 'Register trashpicker berhasil']);
         } else {
             return response()->json(['success' => false, 'message' => 'OTP salah']);
         }
