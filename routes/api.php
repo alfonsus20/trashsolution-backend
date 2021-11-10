@@ -42,6 +42,7 @@ Route::group(['prefix' => 't'], function () {
         Route::get('daftar-permintaan', [PenjualanSampahController::class, 'getDaftarPermintaanPenjemputan']);
         Route::get('daftar-permintaan/{id}', [PenjualanSampahController::class, 'getDetailPermintaanPenjemputan']);
         Route::get('daftar-permintaan/{id}/{status}', [PenjualanSampahController::class, 'ubahStatusPenjualan']);
+        Route::post('edit-data-sampah/{id}', [PenjualanSampahController::class, 'editDataSampah']);
     });
 });
 

@@ -137,4 +137,39 @@ class PenjualanSampahController extends Controller
             return response()->json(['success' => false, 'message' => "Status tidak ditemukan"], 404);
         }
     }
+
+    public function editDataSampah(Request $request)
+    {
+        // get penjualan
+        $penjualan = Penjualan::find($request->penjualan->id);
+
+        // get data sampah
+        $daftar_sampah = $request->daftar_sampah;
+
+        // count & assign new total harga
+        $total_harga = 0;
+
+        foreach ($daftar_sampah as $sampah) {
+            $found_sampah = Sampah::find($sampah['id_sampah']);
+            $total_harga += $found_sampah->harga * $sampah['kuantitas'];
+        }
+        $penjualan->total_harga = $total_harga;
+        $penjualan->save();
+
+        // delete old data sampah in PenjualanSampah
+        $id_penjualan = $penjualan->id;
+        $penjualan_sampah = PenjualanSampah::where('id', $id_penjualan)->get();
+        $penjualan_sampah->delete();
+
+        // assign data sampah to PenjualanSampah
+        $func = function ($sampah) use ($id_penjualan) {
+            return ["id_penjualan" => $id_penjualan, 'id_sampah' => $sampah['id_sampah'], 'kuantitas' => $sampah['kuantitas']];
+        };
+
+        $daftar_sampah_with_id_penjualan = array_map($func, $daftar_sampah);
+
+        PenjualanSampah::insert($daftar_sampah_with_id_penjualan);
+
+        return response()->json(['success' => true, 'message' => 'Edit sampah berhasil']);
+    }
 }
