@@ -94,7 +94,7 @@ class AuthController extends Controller
 
         $otp = OTP::where('phone', $phone)->first();
 
-        if ($otp->otp != $request->otp) {
+        if (!$otp || $otp->otp != $request->otp) {
             return response()->json(['success' => false, 'message' => 'Kode OTP salah!'], 400);
         } else {
             $rules = [
