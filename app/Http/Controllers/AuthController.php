@@ -162,8 +162,9 @@ class AuthController extends Controller
 
     public function getPenggunaProfile()
     {
+        $data = Pengguna::select('pengguna.id','nama','email','phone','lat','long','nominal as saldo')->join('saldo', 'pengguna.id', '=', 'saldo.id_pengguna')->where('pengguna.id', auth()->user()->id)->first();
         return response()->json([
-            'success' => true, 'message' => 'Fetch pengguna profile berhasil', 'data' => auth()->user(), 'role' => 'pengguna'
+            'success' => true, 'message' => 'Fetch pengguna profile berhasil', 'data' => $data, 'role' => 'pengguna'
         ]);
     }
 
