@@ -186,7 +186,7 @@ class AuthController extends Controller
         // check if phone already exist
         $tmp = OTP::where('phone', $phoneNumber)->first();
 
-        if ($tmp->count() == 1){
+        if ($tmp){
             $tmp->delete();
         }
 
