@@ -236,6 +236,22 @@ class AuthController extends Controller
         return response()->json(['success' => true, 'message' => 'Update lokasi trashpicker berhasil']);
     }
 
+    public function updateStatusTrashpicker($status)
+    {
+        $trashpicker = Trashpicker::find(auth()->user()->id);
+        if ($status == 'online') {
+            $trashpicker->availability = true;
+            $trashpicker->save();
+            return response()->json(['success' => true, 'message' => 'Status trashpicker diubah ke online']);
+        } else if ($status == 'offline') {
+            $trashpicker->availability = false;
+            $trashpicker->save();
+            return response()->json(['success' => true, 'message' => 'Status trashpicker diubah ke offline']);
+        } else {
+            return response()->json(['success' => false, 'message' => 'Status tidak ditemukan'], 404);
+        }
+    }
+
     public function getLokasi(Request $request)
     {
         $lat = $request->lat;
