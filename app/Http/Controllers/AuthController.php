@@ -162,12 +162,16 @@ class AuthController extends Controller
 
     public function getPenggunaProfile()
     {
-        return auth()->user();
+        return response()->json([
+            'success' => true, 'message' => 'Fetch pengguna profile berhasil', 'data' => auth()->user(), 'role' => 'pengguna'
+        ]);
     }
 
     public function getTrashpickerProfile()
     {
-        return  auth()->user();
+        return  response()->json([
+            'success' => true, 'message' => 'Fetch trashpicker profile berhasil ', 'data' => auth()->user(), 'role' => 'trashpicker'
+        ]);
     }
 
     public function sendPhoneNumberOTP($phoneNumber)
