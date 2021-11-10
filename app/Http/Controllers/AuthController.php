@@ -162,7 +162,7 @@ class AuthController extends Controller
 
     public function getPenggunaProfile()
     {
-        $data = Pengguna::select('pengguna.id','nama','email','phone','lat','long','nominal as saldo')->join('saldo', 'pengguna.id', '=', 'saldo.id_pengguna')->where('pengguna.id', auth()->user()->id)->first();
+        $data = Pengguna::select('pengguna.id', 'nama', 'email', 'phone', 'lat', 'long', 'nominal as saldo')->join('saldo', 'pengguna.id', '=', 'saldo.id_pengguna')->where('pengguna.id', auth()->user()->id)->first();
         return response()->json([
             'success' => true, 'message' => 'Fetch pengguna profile berhasil', 'data' => $data, 'role' => 'pengguna'
         ]);
@@ -234,5 +234,13 @@ class AuthController extends Controller
         $trashpicker->long = $request->long;
         $trashpicker->save();
         return response()->json(['success' => true, 'message' => 'Update lokasi trashpicker berhasil']);
+    }
+
+    public function getLokasi(Request $request)
+    {
+        $lat = $request->lat;
+        $long = $request->long;
+        $data = json_decode(file_get_contents('http://api.positionstack.com/v1/reverse?access_key=' . env('MAPS_API_KEY') . '&query=' . $lat . ',' . $long))->data[0];
+        return ['success' => true, 'message' => 'fetch lokasi berhasil', 'data' => $data];
     }
 }

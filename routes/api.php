@@ -49,3 +49,4 @@ Route::get('daftar-sampah', [SampahController::class, 'getSampah']);
 
 Route::get('send-otp/{phoneNumber}', [AuthController::class, 'sendPhoneNumberOTP']);
 Route::post('verify-otp', [AuthController::class, 'verifyPhoneNumberOTP']);
+Route::post('/lokasi', [AuthController::class, 'getLokasi']);
