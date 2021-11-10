@@ -4,6 +4,7 @@ use App\Events\PenjualanSampahNotification;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PenggunaController;
 use App\Http\Controllers\PenjualanSampahController;
+use App\Http\Controllers\SaldoController;
 use App\Http\Controllers\SampahController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +30,9 @@ Route::group(['prefix' => 'p'], function () {
         Route::put('update-lokasi', [AuthController::class, 'updateLokasiPengguna']);
         Route::get('home', [PenggunaController::class, 'index']);
         Route::post('jual-sampah', [PenjualanSampahController::class, 'jualSampah']);
+        Route::get('riwayat-pencairan-saldo', [SaldoController::class, 'getRiwayatPencairanSaldo']);
+        Route::post('cairkan-saldo', [SaldoController::class, 'cairkanSaldo']);
+        Route::get('riwayat-penjualan-sampah', [PenjualanSampahController::class, 'getRiwayatPenjualanSampah']);
     });
 });
 
@@ -51,4 +55,4 @@ Route::get('daftar-sampah', [SampahController::class, 'getSampah']);
 
 Route::get('send-otp/{phoneNumber}', [AuthController::class, 'sendPhoneNumberOTP']);
 Route::post('verify-otp', [AuthController::class, 'verifyPhoneNumberOTP']);
-Route::post('/lokasi', [AuthController::class, 'getLokasi']);
+Route::post('lokasi', [AuthController::class, 'getLokasi']);

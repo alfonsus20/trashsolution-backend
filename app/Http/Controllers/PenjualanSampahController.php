@@ -172,4 +172,17 @@ class PenjualanSampahController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Edit sampah berhasil']);
     }
+
+    public function getRiwayatPenjualanSampah()
+    {
+        $daftar_penjualan = Penjualan::where('id_pengguna', auth()->user()->id)->where('status', 'selesai')->select('penjualan.id', 'penjualan.created_at as tanggal', 'trashpicker.nama as nama_trashpicker', 'lat_pengguna', 'long_pengguna', 'lat_trashpicker', 'long_trashpicker')->join('trashpicker', 'id_trashpicker', '=', 'trashpicker.id')->get();
+        $structured = [];
+
+        foreach ($daftar_penjualan as $penjualan) {
+            $daftar_sampah = PenjualanSampah::where('id_penjualan', $penjualan->id)->join('sampah', 'id_sampah', '=', 'sampah.id')->get();
+            $structured[] = ['penjualan' => $penjualan, 'daftar_sampah' => $daftar_sampah];
+        }
+
+        return response()->json(['success' => true, 'message' => 'fetch riwayat penjualan sampah berhasil', 'data' => $structured]);
+    }
 }
