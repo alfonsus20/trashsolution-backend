@@ -141,7 +141,7 @@ class PenjualanSampahController extends Controller
     public function editDataSampah(Request $request)
     {
         // get penjualan
-        $penjualan = Penjualan::find($request->penjualan->id);
+        $penjualan = Penjualan::find($request->penjualan["id"]);
 
         // get data sampah
         $daftar_sampah = $request->daftar_sampah;
@@ -150,7 +150,7 @@ class PenjualanSampahController extends Controller
         $total_harga = 0;
 
         foreach ($daftar_sampah as $sampah) {
-            $found_sampah = Sampah::find($sampah['id_sampah']);
+            $found_sampah = Sampah::find($sampah['id']);
             $total_harga += $found_sampah->harga * $sampah['kuantitas'];
         }
         $penjualan->total_harga = $total_harga;
@@ -158,12 +158,14 @@ class PenjualanSampahController extends Controller
 
         // delete old data sampah in PenjualanSampah
         $id_penjualan = $penjualan->id;
-        $penjualan_sampah = PenjualanSampah::where('id', $id_penjualan)->get();
-        $penjualan_sampah->delete();
+        $penjualan_sampah = PenjualanSampah::where('id_penjualan', $id_penjualan);
+        if($penjualan_sampah){
+            $penjualan_sampah->delete();
+        }
 
         // assign data sampah to PenjualanSampah
         $func = function ($sampah) use ($id_penjualan) {
-            return ["id_penjualan" => $id_penjualan, 'id_sampah' => $sampah['id_sampah'], 'kuantitas' => $sampah['kuantitas']];
+            return ["id_penjualan" => $id_penjualan, 'id_sampah' => $sampah['id'], 'kuantitas' => $sampah['kuantitas'], 'qty' => 0];
         };
 
         $daftar_sampah_with_id_penjualan = array_map($func, $daftar_sampah);
