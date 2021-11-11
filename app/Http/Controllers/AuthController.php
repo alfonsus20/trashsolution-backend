@@ -84,7 +84,7 @@ class AuthController extends Controller
         if (password_verify($inputs['password'], $foundPengguna->password)) {
             return response()->json(['success' => true, 'message' => 'Login pengguna berhasil', 'token' => $foundPengguna->createToken('Personal Access Token', ['pengguna'])->accessToken], 200);
         } else {
-            return response()->json(['success' => false, 'message' => 'Password salah'], 400);
+            return response()->json(['success' => false, 'message' => 'Password salah'], 401);
         }
     }
 
@@ -156,7 +156,7 @@ class AuthController extends Controller
         if (password_verify($inputs['password'], $foundTrashpicker->password)) {
             return response()->json(['success' => true, 'message' => 'Login trashpicker berhasil', 'token' => $foundTrashpicker->createToken('Personal Access Token', ['trashpicker'])->accessToken], 200);
         } else {
-            return response()->json(['success' => false, 'message' => 'Password salah'],400);
+            return response()->json(['success' => false, 'message' => 'Password salah'],401);
         }
     }
 
