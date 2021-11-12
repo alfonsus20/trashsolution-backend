@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Events\PenjualanSampahPenggunaNotification;
-use App\Models\Pengguna;
 use App\Models\Penjualan;
 use App\Models\PenjualanSampah;
 use App\Models\Saldo;
@@ -184,5 +183,27 @@ class PenjualanSampahController extends Controller
         }
 
         return response()->json(['success' => true, 'message' => 'fetch riwayat penjualan sampah berhasil', 'data' => $structured]);
+    }
+
+    public function getTrashpickerCurrentPenjemputan()
+    {
+        $penjemputan = Penjualan::where('id_trashpicker', auth()->user()->id)->where('status', '!=', 'mencari trashpicker')->where('status', '!=', 'selesai')->first();
+
+        if ($penjemputan) {
+            return response()->json(['success' => true, 'message' => 'trashpicker sedang menjemput sampah', 'data' => $penjemputan]);
+        } else {
+            return response()->json(['success' => true, 'message' => 'trashpicker sedang idle', 'data' => null]);
+        }
+    }
+
+    public function getPenggunaCurrentPenjualan()
+    {
+        $penjualan = Penjualan::where('id_pengguna', auth()->user()->id)->where('status', '!=', 'selesai')->first();
+        if ($penjualan) {
+            $trashpicker = Trashpicker::find($penjualan->id_trashpicker);
+            return response()->json(['success' => true, 'message' => 'pengguna sedang melakukan penjualan sampah', 'data' => ['penjualan' => $penjualan, 'trashpicker' => $trashpicker]]);
+        } else {
+            return response()->json(['success' => true, 'message' => 'pengguna tidak sedang melakukan penjualan sampah', 'data' => null]);
+        }
     }
 }

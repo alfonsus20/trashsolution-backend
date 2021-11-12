@@ -33,6 +33,7 @@ Route::group(['prefix' => 'p'], function () {
         Route::get('riwayat-pencairan-saldo', [SaldoController::class, 'getRiwayatPencairanSaldo']);
         Route::post('cairkan-saldo', [SaldoController::class, 'cairkanSaldo']);
         Route::get('riwayat-penjualan-sampah', [PenjualanSampahController::class, 'getRiwayatPenjualanSampah']);
+        Route::get('current-penjualan', [PenjualanSampahController::class, 'getPenggunaCurrentPenjualan']);
     });
 });
 
@@ -48,6 +49,7 @@ Route::group(['prefix' => 't'], function () {
         Route::get('daftar-permintaan/{id}/{status}', [PenjualanSampahController::class, 'ubahStatusPenjualan']);
         Route::post('edit-data-sampah/{id}', [PenjualanSampahController::class, 'editDataSampah']);
         Route::get('update-status/{status}', [AuthController::class, 'updateStatusTrashpicker']);
+        Route::get('current-penjemputan', [PenjualanSampahController::class, 'getTrashpickerCurrentPenjemputan']);
     });
 });
 
