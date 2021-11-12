@@ -64,7 +64,7 @@ class PenjualanSampahController extends Controller
     public function getDetailPermintaanPenjemputan($id_penjualan)
     {
         $info_penjualan = Penjualan::find($id_penjualan);
-        $pengguna = Penjualan::find($id_penjualan)->pengguna()->get();
+        $pengguna = Penjualan::find($id_penjualan)->pengguna()->first();
         $penjualan_sampah = PenjualanSampah::where("id_penjualan", $id_penjualan)->get();
 
         $penjualan_sampah_with_sampah = [];
