@@ -100,7 +100,7 @@ class PenjualanSampahController extends Controller
             $penjualan->long_trashpicker = auth()->user()->long;
             $penjualan->save();
 
-            event(new PenjualanSampahPenggunaNotification($penjualan, "Update status ke menunggu trashpicker"));
+            event(new PenjualanSampahPenggunaNotification($penjualan, "tunggu"));
 
             return response()->json(['success' => true, 'message' => "Ubah status ke menunggu trashpicker berhasil"]);
         } else if ($status == 'tiba') {
@@ -110,7 +110,7 @@ class PenjualanSampahController extends Controller
             $penjualan->status = 'tiba';
             $penjualan->save();
 
-            event(new PenjualanSampahPenggunaNotification($penjualan, "Update status ke tiba di lokasi"));
+            event(new PenjualanSampahPenggunaNotification($penjualan, "tiba"));
 
             return response()->json(['success' => true, 'message' => "Ubah status ke tiba berhasil"]);
         } else if ($status == 'selesai') {
@@ -129,7 +129,7 @@ class PenjualanSampahController extends Controller
             $trashpicker->availability = true;
             $trashpicker->save();
 
-            event(new PenjualanSampahPenggunaNotification($penjualan, "Update status ke selesai"));
+            event(new PenjualanSampahPenggunaNotification($penjualan, "selesai"));
 
             return response()->json(['success' => true, 'message' => "Ubah status ke selesai berhasil"]);
         } else {
