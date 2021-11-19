@@ -149,7 +149,7 @@ class PenjualanSampahController extends Controller
         $total_harga = 0;
 
         foreach ($daftar_sampah as $sampah) {
-            $found_sampah = Sampah::find($sampah['id']);
+            $found_sampah = Sampah::find($sampah['id_sampah']);
             $total_harga += $found_sampah->harga * $sampah['kuantitas'];
         }
         $penjualan->total_harga = $total_harga;
@@ -164,7 +164,7 @@ class PenjualanSampahController extends Controller
 
         // assign data sampah to PenjualanSampah
         $func = function ($sampah) use ($id_penjualan) {
-            return ["id_penjualan" => $id_penjualan, 'id_sampah' => $sampah['id'], 'kuantitas' => $sampah['kuantitas'], 'qty' => 0];
+            return ["id_penjualan" => $id_penjualan, 'id_sampah' => $sampah['id_sampah'], 'kuantitas' => $sampah['kuantitas'], 'qty' => 0];
         };
 
         $daftar_sampah_with_id_penjualan = array_map($func, $daftar_sampah);
