@@ -63,6 +63,11 @@ class PenjualanSampahController extends Controller
     public function getDetailPermintaanPenjemputan($id_penjualan)
     {
         $info_penjualan = Penjualan::find($id_penjualan);
+
+        if(!$info_penjualan){
+            return response()->json(['success'=> false, 'message'=> "Penjualan sampah tidak ditemukan"], 404);
+        }
+
         $pengguna = Penjualan::find($id_penjualan)->pengguna()->first();
         $penjualan_sampah = PenjualanSampah::where("id_penjualan", $id_penjualan)->get();
 
